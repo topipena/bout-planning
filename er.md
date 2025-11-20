@@ -19,6 +19,7 @@ erDiagram
   AREAS {
     uuid id PK
     text name
+    text country_code FK
   }
 
   MEMBERSHIPS {
@@ -34,6 +35,16 @@ erDiagram
     uuid area_id FK
     uuid category_id FK
     text name
+    numeric horsepower
+    text propulsion_type
+    int capacity
+  }
+
+  VESSEL_POSITIONS {
+    uuid id PK
+    uuid vessel_id FK
+    timestamptz at
+    jsonb location "lat/lng"
   }
 
   VESSEL_CATEGORIES {
@@ -44,7 +55,6 @@ erDiagram
 
   ROUTES {
     uuid id PK
-    uuid operator_id FK
     jsonb name_i18n
     jsonb limits "speed/capacity/weather windows"
   }
@@ -67,7 +77,7 @@ erDiagram
   }
 
   AREA_SETTINGS {
-    uuid area_id FK
+    uuid area_id PK
     numeric commission_pct
     text payment_timing "ENUM: on_acceptance|after_trip"
     uuid pricing_model_id FK

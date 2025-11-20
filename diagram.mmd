@@ -1,0 +1,68 @@
+erDiagram
+  USERS {
+    text id PK
+    text email
+  }
+
+  OPERATORS {
+    uuid id PK
+    text name
+    text size "ENUM: small|large"
+  }
+
+  AREAS {
+    uuid id PK
+    text name
+  }
+
+  AREA_OPERATORS {
+    uuid area_id FK
+    uuid operator_id FK
+  }
+
+  MEMBERSHIPS {
+    text user_id FK
+    text role
+    uuid operator_id FK
+    uuid area_id FK
+  }
+
+  VESSELS {
+    uuid id PK
+    uuid operator_id FK
+    text name
+  }
+
+  ROUTES {
+    uuid id PK
+    uuid operator_id FK
+    uuid area_id FK
+    jsonb name_i18n
+  }
+
+  TRIPS {
+    uuid id PK
+    uuid vessel_id FK
+    uuid route_id FK
+    uuid operator_id FK
+    uuid area_id FK
+    text captain_user_id FK
+    timestamptz start_time
+    timestamptz end_time
+  }
+
+  USERS ||--o{ MEMBERSHIPS : has
+  OPERATORS ||--o{ MEMBERSHIPS : scopes
+  AREAS ||--o{ MEMBERSHIPS : scopes
+
+  AREAS ||--o{ AREA_OPERATORS : links
+  OPERATORS ||--o{ AREA_OPERATORS : links
+
+  OPERATORS ||--o{ VESSELS : owns
+
+  OPERATORS ||--o{ ROUTES : defines
+  AREAS ||--o{ ROUTES : located_in
+
+  VESSELS ||--o{ TRIPS : uses
+  ROUTES ||--o{ TRIPS : scheduled_on
+  USERS  ||--o{ TRIPS : captains

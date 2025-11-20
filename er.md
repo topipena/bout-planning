@@ -100,6 +100,58 @@ erDiagram
     jsonb conditions "optional extra filters"
   }
 
+  BOOKINGS {
+    uuid id PK
+    text passenger_user_id FK
+    uuid pickup_service_point_id FK
+    uuid dropoff_service_point_id FK
+    uuid area_id FK
+    uuid vessel_category_id FK
+    int pax_count
+    timestamptz requested_departure
+    numeric quoted_price
+    text currency
+    text status "requested|priced|awaiting_payment|paid|no_availability|no_captain|cancelled|failed"
+    uuid trip_id FK "nullable – set once captain accepts and trip is created"
+    timestamptz created_at
+  }
+
+  PAYMENT_INTENTS {
+    uuid id PK
+    uuid booking_id FK
+    numeric amount
+    text currency
+    text provider "stripe"
+    text provider_intent_id
+    text status "requires_payment_method|requires_confirmation|succeeded|failed|refunded"
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  CAPTAIN_OFFERS {
+    uuid id PK
+    uuid booking_id FK
+    text captain_user_id FK
+    uuid operator_id FK
+    text status "notified|accepted|declined|expired|cancelled"
+    timestamptz notified_at
+    timestamptz responded_at
+  }
+
+  VESSELS ||--|| VESSEL_POSITIONS : has
+
+  BOOKINGS ||--o{ CAPTAIN_OFFERS : offered_to
+  USERS   ||--o{ CAPTAIN_OFFERS : captain
+  OPERATORS ||--o{ CAPTAIN_OFFERS : via_operator
+
+  BOOKINGS ||--o{ PAYMENT_INTENTS : paid_via
+  BOOKINGS ||--|| TRIPS : may_spawn
+  USERS ||--o{ BOOKINGS : passenger
+  SERVICE_POINTS ||--o{ BOOKINGS : pickup_for
+  SERVICE_POINTS ||--o{ BOOKINGS : dropoff_for
+  VESSEL_CATEGORIES ||--o{ BOOKINGS : category_for
+  AREAS ||--o{ BOOKINGS : in_area
+
 
   USERS ||--o{ MEMBERSHIPS : has
   OPERATORS ||--o{ MEMBERSHIPS : scopes
